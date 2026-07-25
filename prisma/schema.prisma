@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ItemStatus {
+  OPEN
+  CLAIMED
+  RESOLVED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String?
+  email        String    @unique
+  image        String?
+  role         Role      @default(USER)
+  items        Item[]
+  claims       Claim[]
+  createdAt    DateTime  @default(now())
+}
+
+model Item {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  category    String
+  location    String
+  imageUrl    String?
+  type        String
+  status      ItemStatus @default(OPEN)
+  postedBy    User       @relation(fields: [postedById], references: [id])
+  postedById  String
+  claims      Claim[]
+  createdAt   DateTime   @default(now())
+
+  @@index([status])
+  @@index([category])
+}
+
+model Claim {
+  id          String   @id @default(cuid())
+  item        Item     @relation(fields: [itemId], references: [id])
+  itemId      String
+  claimant    User     @relation(fields: [claimantId], references: [id])
+  claimantId  String
+  proof       String
+  approved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
