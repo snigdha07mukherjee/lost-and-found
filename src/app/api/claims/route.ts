@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { sendClaimEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -26,10 +27,15 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  await prisma.item.update({
+  const item = await prisma.item.update({
     where: { id: itemId },
     data: { status: "CLAIMED" },
+    include: { postedBy: true },
   });
+
+  if (item.postedBy.email) {
+    sendClaimEmail(item.postedBy.email, item.title);
+  }
 
   return NextResponse.json(claim, { status: 201 });
 }
