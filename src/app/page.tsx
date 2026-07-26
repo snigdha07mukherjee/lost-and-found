@@ -49,14 +49,18 @@ export default async function Home() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <div key={item.id} className="rounded-xl border p-4">
-              <h3 className="font-medium">{item.title}</h3>
-              <p className="text-sm text-gray-500">{item.location}</p>
-              <span className="text-xs uppercase text-blue-600">
-                {item.status}
-              </span>
-            </div>
-          ))}
+  <Link
+    key={item.id}
+    href={`/items/${item.id}`}
+    className="block rounded-xl border p-4 hover:shadow-md"
+  >
+    <h3 className="font-medium">{item.title}</h3>
+    <p className="text-sm text-gray-500">{item.location}</p>
+    <span className="text-xs uppercase text-blue-600">
+      {item.status}
+    </span>
+  </Link>
+))}
         </div>
       )}
     </main>
